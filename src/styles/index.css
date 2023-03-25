@@ -6,4 +6,30 @@
     body {
         font-family: 'Open Sans', sans-serif;
     }
+    .quiz-container {
+        @apply grid gap-6;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+    .custom-radio-input {
+        @apply appearance-none w-6 h-6 border border-[#ccc] rounded-md relative cursor-pointer transition-colors;
+    }
+    .custom-radio-input:checked::before {
+        content: '\2713';
+        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+    }
+    .custom-radio-input:checked {
+        background-color: #27f127;
+    }
+    .overlay {
+        content: '';
+        @apply absolute z-20 inset-0 bg-[#e6e6e6e8];
+    }
+    .spin {
+        animation: spin 1s infinite;
+    }
+    @keyframes spin {
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
 }
