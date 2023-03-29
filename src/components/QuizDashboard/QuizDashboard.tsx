@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, PUBLIC_KEY } from '../../config/supabase.json';
+import { SUPABASE_URL, PUBLIC_KEY, QUESTIONS_AMOUNT } from '../../config/supabase.json';
 import { useEffect, useState } from 'react';
 import { QuizForm } from './QuizForm/QuizForm';
 import { Database } from '@/schema/supabase';
 import { FinalScreen } from './ResultsScreen/ResultsScreen';
 
 interface Props {
-    currentQuizName: 'html' | 'css' | 'javascript' | null;
+    currentQuizName: 'html' | 'css' | 'javascript';
 }
 
 type QuestionDetails =
@@ -15,14 +15,16 @@ type QuestionDetails =
           question: string;
           answers: string[] | null;
       }[]
-    | null;
 
 const supabase = createClient<Database>(SUPABASE_URL, PUBLIC_KEY);
 
 export const QuizDashboard = ({ currentQuizName }: Props) => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [currentScore, setCurrentScore] = useState(0);
-    const [questions, setQuestions] = useState<QuestionDetails>();
+    const [randomQuestionNumber, setRandomQuestionNumber] = useState(() =>
+        Math.trunc(Math.random() * QUESTIONS_AMOUNT)
+    );
+    const [score, setScore] = useState(0);
+    const [questionsList, setQuestionsList] = useState<QuestionDetails>([]);
     const [isDataLoading, setIsDataLoading] = useState(false);
     const [isQuizFinished, setIsQuizFinished] = useState(false);
 
@@ -37,34 +39,46 @@ export const QuizDashboard = ({ currentQuizName }: Props) => {
         const { data } = await supabase
             .from(`${currentQuizName}_questions`)
             .select('correctAnswer')
-            .range(currentQuestion, currentQuestion);
-        if (checkedAnswer === data?.[0]?.correctAnswer) setCurrentScore(previousScore => ++previousScore);
+            .range(randomQuestionNumber, randomQuestionNumber);
+        if (checkedAnswer === data?.[0]?.correctAnswer) setScore(previousScore => ++previousScore);
         setCurrentQuestion(prevQuestion => ++prevQuestion);
         setIsDataLoading(false);
-        if (currentQuestion === 2) setIsQuizFinished(true)
-        console.log(checkedAnswer === data?.[0]?.correctAnswer);
+        setRandomQuestionNumber(Math.trunc(Math.random() * QUESTIONS_AMOUNT));
+        if (questionsList?.length === 5) setIsQuizFinished(true);
     };
 
     useEffect(() => {
-        (async () => {
+        if (isQuizFinished) return;
+        (async function getNewQuestion() {
             setIsDataLoading(true);
-            const { data } = await supabase
+            console.log(currentQuizName)
+            const { data, error } = await supabase
                 .from(`${currentQuizName}_questions`)
                 .select('question, answers')
-                .range(0, 2);
-            setQuestions(data);
+                .range(randomQuestionNumber, randomQuestionNumber);
+            setQuestionsList(prevQuestionsList => {
+                const isQuestionDuplicate = prevQuestionsList?.some(
+                    questionDetails => questionDetails.question === data?.[0]?.question
+                );
+                console.log(isQuestionDuplicate)
+                if (isQuestionDuplicate) getNewQuestion();
+                if (!isQuestionDuplicate && data && prevQuestionsList !== null)
+                    return [...prevQuestionsList, ...data];
+                return prevQuestionsList;
+            });
+            console.log(data, error);
             setIsDataLoading(false);
         })();
-    }, []);
+    }, [randomQuestionNumber]);
     return (
         <>
             {isQuizFinished ? (
-                <FinalScreen score={currentScore} totalQuestions={3}/>
+                <FinalScreen score={score} totalQuestions={questionsList.length} />
             ) : (
                 <QuizForm
                     isDataLoading={isDataLoading}
                     onAnswerSelect={chooseAnswerHandler}
-                    question={questions?.[currentQuestion]}
+                    question={questionsList?.[currentQuestion]}
                 />
             )}
         </>

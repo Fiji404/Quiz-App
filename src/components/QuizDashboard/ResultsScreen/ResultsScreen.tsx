@@ -1,6 +1,6 @@
 interface Props {
     score: number;
-    totalQuestions: number;
+    totalQuestions: number | undefined;
 }
 
 export const FinalScreen = ({ score, totalQuestions }: Props) => {

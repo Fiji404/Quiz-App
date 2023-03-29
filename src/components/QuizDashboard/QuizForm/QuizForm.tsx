@@ -21,7 +21,7 @@ export const QuizForm = ({ question, onAnswerSelect, isDataLoading }: Props) => 
                 isDataLoading && 'before:overlay'
             }`}
         >
-            <h2 className="text-center font-bold text-5xl px-6 py-3 border-b bg-[rgb(243,243,243)] border-[#d4d4d4]">{question?.question}</h2>
+            <h2 className="text-center font-bold text-4xl px-6 py-3 border-b bg-[rgb(243,243,243)] border-[#d4d4d4]">{question?.question}</h2>
             <div className="flex flex-col">
                 {question?.answers?.map(answer => (
                     <QuizFormAnswer key={answer} answer={answer} />
