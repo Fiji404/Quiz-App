@@ -1,26 +1,22 @@
-import availableQuizes from '../../data/availableQuizzes.json';
+import availableQuizesList from '@/data/availableQuizzes.json';
+import { QuizContext } from '@/contexts/QuizContext/QuizContext';
+import { QuizDashboard } from '@components/QuizDashboard/QuizDashboard';
 import { AvailableQuiz } from './AvailableQuiz';
 import { useContext } from 'react';
-import { QuizContext } from '../../contexts/QuizContext/QuizContext';
-import { QuizDashboard } from '../QuizDashboard/QuizDashboard';
 
 export const AvailableQuizzes = () => {
     const { quizSelectionHandler, currentQuizName, isQuizStarted } = useContext(QuizContext);
 
     return (
         <>
-            {!isQuizStarted ? (
-                <ul
-                    onClick={quizSelectionHandler}
-                    className="mt-8 max-w-[95%] mx-auto quiz-container"
-                >
-                    {availableQuizes.map((props, i) => (
+            {!isQuizStarted && (
+                <ul onClick={quizSelectionHandler} className="mt-8 mb-4 max-w-[95%] mx-auto quiz-container">
+                    {availableQuizesList.map(props => (
                         <AvailableQuiz key={props.title} {...props} />
                     ))}
                 </ul>
-            ) : (
-                <QuizDashboard currentQuizName={currentQuizName} />
             )}
+            {isQuizStarted && <QuizDashboard currentQuizName={currentQuizName} />}
         </>
     );
 };

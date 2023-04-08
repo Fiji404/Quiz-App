@@ -12,17 +12,10 @@ export const QuizContextProvider = ({ children }: PropsWithChildren) => {
 
     const quizSelectionHandler = ({ target }: React.MouseEvent) => {
         if (!(target instanceof Element)) return;
-        const selectedQuizName = target
-            .closest('button')
-            ?.closest('li')
-            ?.querySelector('h2')
-            ?.textContent?.trim()
-            .toLowerCase();
-        if (
-            selectedQuizName &&
-            (selectedQuizName === 'html' || selectedQuizName === 'css' || selectedQuizName === 'javascript')
-        )
-            setCurrentQuizName(selectedQuizName);
+        const quizNameHeading = target.closest('button')?.closest('li')?.querySelector('h2');
+        const quizName = quizNameHeading?.textContent?.trim().toLowerCase();
+        if (quizName && (quizName === 'html' || quizName === 'css' || quizName === 'javascript'))
+            setCurrentQuizName(quizName);
     };
 
     return (

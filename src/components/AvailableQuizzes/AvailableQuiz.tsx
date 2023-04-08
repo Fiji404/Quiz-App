@@ -27,9 +27,7 @@ const TOPIC_ICONS: Record<string, JSX.Element> = {
 
 export const AvailableQuiz = ({ title, description, topic }: Props) => {
     return (
-        <li
-            className="flex flex-col justify-between min-h-[280px] border rounded-lg bg-[#fafafa] opacity-0 animate-[originate_1s_1s_forwards] py-4 px-3"
-        >
+        <li className="flex flex-col justify-between min-h-[280px] border rounded-lg bg-[#fafafa] opacity-0 animate-[originate_1s_1s_forwards] py-4 px-3">
             <h2 className="flex justify-center items-center gap-3 text-center text-4xl font-bold">
                 {title} {QUIZ_ICONS[title]}
             </h2>

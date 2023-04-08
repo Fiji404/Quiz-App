@@ -1,20 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, PUBLIC_KEY, QUESTIONS_AMOUNT } from '../../config/supabase.json';
+import { SUPABASE_URL, PUBLIC_KEY, QUESTIONS_AMOUNT } from '@/config/supabase.json';
 import { useEffect, useState } from 'react';
 import { QuizForm } from './QuizForm/QuizForm';
 import { Database } from '@/schema/supabase';
+import { PossibleQuizNames, QuestionDetails } from '@/types/SupabaseTypes';
 import { FinalScreen } from './ResultsScreen/ResultsScreen';
+import { ReturnToQuizzes } from './ReturnToQuizzes/ReturnToQuizzes';
 
 interface Props {
-    currentQuizName: 'html' | 'css' | 'javascript';
+    currentQuizName: PossibleQuizNames | '';
 }
-
-type QuestionDetails =
-    | {
-          [key: string]: string | null | string[];
-          question: string;
-          answers: string[] | null;
-      }[]
 
 const supabase = createClient<Database>(SUPABASE_URL, PUBLIC_KEY);
 
@@ -23,8 +18,8 @@ export const QuizDashboard = ({ currentQuizName }: Props) => {
     const [randomQuestionNumber, setRandomQuestionNumber] = useState(() =>
         Math.trunc(Math.random() * QUESTIONS_AMOUNT)
     );
-    const [score, setScore] = useState(0);
-    const [questionsList, setQuestionsList] = useState<QuestionDetails>([]);
+    const [userScore, setUserScore] = useState(0);
+    const [questionsList, setQuestionsList] = useState<QuestionDetails[]>([]);
     const [isDataLoading, setIsDataLoading] = useState(false);
     const [isQuizFinished, setIsQuizFinished] = useState(false);
 
@@ -40,46 +35,52 @@ export const QuizDashboard = ({ currentQuizName }: Props) => {
             .from(`${currentQuizName}_questions`)
             .select('correctAnswer')
             .range(randomQuestionNumber, randomQuestionNumber);
-        if (checkedAnswer === data?.[0]?.correctAnswer) setScore(previousScore => ++previousScore);
+        if (checkedAnswer === data?.[0]?.correctAnswer) setUserScore(previousScore => ++previousScore);
         setCurrentQuestion(prevQuestion => ++prevQuestion);
         setIsDataLoading(false);
         setRandomQuestionNumber(Math.trunc(Math.random() * QUESTIONS_AMOUNT));
-        if (questionsList?.length === 5) setIsQuizFinished(true);
+        if (currentQuestion === 4) setIsQuizFinished(true);
     };
 
     useEffect(() => {
         if (isQuizFinished) return;
         (async function getNewQuestion() {
             setIsDataLoading(true);
-            console.log(currentQuizName)
-            const { data, error } = await supabase
-                .from(`${currentQuizName}_questions`)
-                .select('question, answers')
-                .range(randomQuestionNumber, randomQuestionNumber);
-            setQuestionsList(prevQuestionsList => {
-                const isQuestionDuplicate = prevQuestionsList?.some(
-                    questionDetails => questionDetails.question === data?.[0]?.question
-                );
-                console.log(isQuestionDuplicate)
-                if (isQuestionDuplicate) getNewQuestion();
-                if (!isQuestionDuplicate && data && prevQuestionsList !== null)
-                    return [...prevQuestionsList, ...data];
-                return prevQuestionsList;
-            });
-            console.log(data, error);
+            try {
+                const { data, error } = await supabase
+                    .from(`${currentQuizName}_questions`)
+                    .select('question, answers')
+                    .range(randomQuestionNumber, randomQuestionNumber);
+                if (error) throw new Error(error.message);
+                setQuestionsList(prevQuestionsList => {
+                    const isQuestionDuplicated = prevQuestionsList?.some(
+                        questionDetails => questionDetails.question === data?.[0]?.question
+                    );
+                    if (isQuestionDuplicated) getNewQuestion();
+                    if (!isQuestionDuplicated && data && prevQuestionsList !== null)
+                        return [...prevQuestionsList, ...data];
+                    return prevQuestionsList;
+                });
+            } catch (err) {
+                console.error(err);
+            }
             setIsDataLoading(false);
         })();
     }, [randomQuestionNumber]);
     return (
         <>
             {isQuizFinished ? (
-                <FinalScreen score={score} totalQuestions={questionsList.length} />
+                <FinalScreen score={userScore} totalQuestions={questionsList.length} />
             ) : (
-                <QuizForm
-                    isDataLoading={isDataLoading}
-                    onAnswerSelect={chooseAnswerHandler}
-                    question={questionsList?.[currentQuestion]}
-                />
+                <>
+                    <ReturnToQuizzes />
+                    <QuizForm
+                        questionNumber={currentQuestion + 1}
+                        isDataLoading={isDataLoading}
+                        onAnswerSelect={chooseAnswerHandler}
+                        questionDetails={questionsList?.[currentQuestion]}
+                    />
+                </>
             )}
         </>
     );
