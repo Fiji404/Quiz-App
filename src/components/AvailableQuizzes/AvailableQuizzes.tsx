@@ -5,12 +5,19 @@ import { AvailableQuiz } from './AvailableQuiz';
 import { useContext } from 'react';
 
 export const AvailableQuizzes = () => {
-    const { quizSelectionHandler, currentQuizName, isQuizStarted } = useContext(QuizContext);
+    const { updateCurrentQuizName, currentQuizName, isQuizStarted } = useContext(QuizContext);
 
+    const chooseQuizHandler = ({ target }: React.MouseEvent) => {
+        if (!(target instanceof Element)) return;
+        const quizNameHeading = target.closest('button')?.closest('li')?.querySelector('h2');
+        const quizName = quizNameHeading?.textContent?.trim().toLowerCase();
+        if (quizName && (quizName === 'html' || quizName === 'css' || quizName === 'javascript'))
+            updateCurrentQuizName(quizName);
+    };
     return (
         <>
             {!isQuizStarted && (
-                <ul onClick={quizSelectionHandler} className="mt-8 mb-4 max-w-[95%] mx-auto quiz-container">
+                <ul onClick={chooseQuizHandler} className="mt-8 mb-4 max-w-[95%] mx-auto quiz-container">
                     {availableQuizesList.map(props => (
                         <AvailableQuiz key={props.title} {...props} />
                     ))}
