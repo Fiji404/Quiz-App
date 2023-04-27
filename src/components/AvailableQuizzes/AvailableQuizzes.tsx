@@ -4,6 +4,17 @@ import { QuizDashboard } from '@components/QuizDashboard/QuizDashboard';
 import { AvailableQuiz } from './AvailableQuiz';
 import { useContext } from 'react';
 
+enum Quizzes {
+    html,
+    css,
+    javascript,
+}
+
+const checkIsQuizAvailable = (quizName: string) => {
+    if (Object.values(Quizzes).includes('html' || 'css' || 'javascript' || 'sass' || 'flags'))
+        return quizName;
+};
+
 export const AvailableQuizzes = () => {
     const { updateCurrentQuizName, currentQuizName, isQuizStarted } = useContext(QuizContext);
 
@@ -11,8 +22,7 @@ export const AvailableQuizzes = () => {
         if (!(target instanceof Element)) return;
         const quizNameHeading = target.closest('button')?.closest('li')?.querySelector('h2');
         const quizName = quizNameHeading?.textContent?.trim().toLowerCase();
-        if (quizName && (quizName === 'html' || quizName === 'css' || quizName === 'javascript'))
-            updateCurrentQuizName(quizName);
+        if (quizName && checkIsQuizAvailable(quizName)) updateCurrentQuizName(quizName);
     };
     return (
         <>
