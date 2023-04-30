@@ -1,15 +1,29 @@
 import { LoadingSpinner } from '@components/UI/LoadingSpinner';
 import { QuizFormAnswer } from './QuizFormAnswer';
 import { QuestionDetails } from '@/types/SupabaseTypes';
+import { CSSProperties, useContext } from 'react';
+import { QuizPreferencesContext } from '@/contexts/QuizPreferences/QuizPreferencesContext';
 
 interface Props {
     questionDetails: QuestionDetails | undefined;
     onAnswerSelect(e: React.FormEvent): Promise<void>;
     isDataLoading: boolean;
     questionNumber: number;
+    timeLimit: number;
 }
 
-export const QuizForm = ({ questionDetails, onAnswerSelect, isDataLoading, questionNumber }: Props) => {
+interface ElementStyleProperties extends CSSProperties {
+    '--time-limit': string;
+}
+
+export const QuizForm = ({
+    questionDetails,
+    onAnswerSelect,
+    isDataLoading,
+    questionNumber,
+    timeLimit,
+}: Props) => {
+    const { questionAmount } = useContext(QuizPreferencesContext);
     return (
         <form
             onSubmit={onAnswerSelect}
@@ -20,7 +34,14 @@ export const QuizForm = ({ questionDetails, onAnswerSelect, isDataLoading, quest
             <h2 className="text-center font-bold text-4xl px-6 py-3 border-b bg-[rgb(243,243,243)] border-[#d4d4d4]">
                 {questionDetails?.question}
             </h2>
-            <h3 className='my-2 text-xl bg-[#e9e9e9] w-fit mx-auto px-1 rounded-md border border-[#ccc]'>Q{questionNumber}/{20}</h3>
+            <div
+                aria-hidden="true"
+                style={{ '--time-limit': `${timeLimit}s` } as ElementStyleProperties}
+                className="time-limit-tracker"
+            ></div>
+            <h3 className="my-2 text-xl bg-[#f1f1f1] w-fit mx-auto px-1 rounded-md border border-[#dadada]">
+                Q{questionNumber}/{questionAmount}
+            </h3>
 
             <div className="flex flex-col">
                 {questionDetails?.answers?.map(answer => (

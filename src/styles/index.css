@@ -27,6 +27,16 @@
     .spin {
         animation: spin 1s infinite;
     }
+    .time-limit-tracker {
+        @apply h-1 w-full bg-[#4DAAF7];
+        animation: shrinking var(--time-limit) forwards;
+    }
+
+    @keyframes shrinking {
+        to {
+            @apply w-0;
+        }
+    }
     @keyframes spin {
         to {
             transform: translate(-50%, -50%) rotate(360deg);

@@ -1,11 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, PUBLIC_KEY, QUESTIONS_AMOUNT } from '@/config/supabase.json';
-import { useEffect, useState } from 'react';
+import { SUPABASE_URL, PUBLIC_KEY } from '@/config/supabase.json';
+import { useContext, useEffect, useState } from 'react';
 import { QuizForm } from './QuizForm/QuizForm';
 import { Database } from '@/schema/supabase';
 import { PossibleQuizNames, QuestionDetails } from '@/types/SupabaseTypes';
 import { FinalScreen } from './ResultsScreen/ResultsScreen';
 import { ReturnToQuizzes } from './ReturnToQuizzes/ReturnToQuizzes';
+import { QuizPreferencesContext } from '@/contexts/QuizPreferences/QuizPreferencesContext';
 
 interface Props {
     currentQuizName: PossibleQuizNames | '';
@@ -14,9 +15,10 @@ interface Props {
 const supabase = createClient<Database>(SUPABASE_URL, PUBLIC_KEY);
 
 export const QuizDashboard = ({ currentQuizName }: Props) => {
+    const { questionAmount,timeLimit } = useContext(QuizPreferencesContext);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [randomQuestionNumber, setRandomQuestionNumber] = useState(() =>
-        Math.trunc(Math.random() * QUESTIONS_AMOUNT)
+        Math.trunc(Math.random() * questionAmount)
     );
     const [userScore, setUserScore] = useState(0);
     const [questionsList, setQuestionsList] = useState<QuestionDetails[]>([]);
@@ -38,7 +40,7 @@ export const QuizDashboard = ({ currentQuizName }: Props) => {
         if (checkedAnswer === data?.[0]?.correctAnswer) setUserScore(previousScore => ++previousScore);
         setCurrentQuestion(prevQuestion => ++prevQuestion);
         setIsDataLoading(false);
-        setRandomQuestionNumber(Math.trunc(Math.random() * QUESTIONS_AMOUNT));
+        setRandomQuestionNumber(Math.trunc(Math.random() * questionAmount));
         if (currentQuestion === 4) setIsQuizFinished(true);
     };
 
@@ -69,12 +71,13 @@ export const QuizDashboard = ({ currentQuizName }: Props) => {
     }, [randomQuestionNumber]);
     return (
         <>
+            <ReturnToQuizzes />
             {isQuizFinished ? (
                 <FinalScreen score={userScore} totalQuestions={questionsList.length} />
             ) : (
                 <>
-                    <ReturnToQuizzes />
                     <QuizForm
+                        timeLimit={timeLimit}
                         questionNumber={currentQuestion + 1}
                         isDataLoading={isDataLoading}
                         onAnswerSelect={chooseAnswerHandler}

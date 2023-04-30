@@ -7,13 +7,13 @@ export const App = () => {
         <>
             <QuizPreferencesProvider>
                 <Nav />
+                <QuizContextProvider>
+                    <main className="flex flex-col justify-center grow h-full">
+                        <WelcomeHeader />
+                        <AvailableQuizzes />
+                    </main>
+                </QuizContextProvider>
             </QuizPreferencesProvider>
-            <QuizContextProvider>
-                <main className="flex flex-col justify-center grow h-full">
-                    <WelcomeHeader />
-                    <AvailableQuizzes />
-                </main>
-            </QuizContextProvider>
         </>
     );
 };

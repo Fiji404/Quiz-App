@@ -3,11 +3,9 @@ import { PropsWithChildren, useState } from 'react';
 import { PossibleQuizNames } from '@/types/SupabaseTypes';
 
 export const QuizContextProvider = ({ children }: PropsWithChildren) => {
-    const [currentQuizName, setCurrentQuizName] = useState<PossibleQuizNames | ''>('');
+    const [currentQuizName, setCurrentQuizName] = useState<PossibleQuizNames>('');
 
-    const stopQuizHandler = () => {
-        setCurrentQuizName('');
-    };
+    const stopQuiz = () => setCurrentQuizName('');
 
     const updateCurrentQuizName = (quizName: PossibleQuizNames) => {
         setCurrentQuizName(quizName);
@@ -19,7 +17,7 @@ export const QuizContextProvider = ({ children }: PropsWithChildren) => {
                 isQuizStarted: !!currentQuizName,
                 currentQuizName,
                 updateCurrentQuizName,
-                stopQuizHandler,
+                stopQuiz
             }}
         >
             {children}
