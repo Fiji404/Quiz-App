@@ -9,7 +9,7 @@ export const NavGithubLink = () => {
             target="_blank"
             href="https://github.com/Fiji404/Quizzy.git"
         >
-            GitHub <FaGithub fontSize="1.4rem" color="#222222" />
+            GitHub <FaGithub className="text-2xl text-[#222]" />
         </a>
     );
 };

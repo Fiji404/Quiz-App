@@ -8,15 +8,19 @@ const preferencesNamesInCamelCase: Record<string, string> = {
 };
 
 export const QuizPreferencesContextProvider = ({ children }: PropsWithChildren) => {
-    const [userPreferences, setUserPreferences] = useState(() => {
+    const getUserSavedPreferences = () => {
         const userSavedPreferences = Object.entries(localStorage);
+        const validQuizPreferencesNames = Object.values(preferencesNamesInCamelCase);
         if (userSavedPreferences.length === 0) return { timeLimit: 5, questionAmount: 5 };
         const userSavedPreferencesObj = userSavedPreferences.reduce(
-            (acc, [key, value]) => ({ ...acc, [key]: +value }),
+            (acc, [key, value]) =>
+                validQuizPreferencesNames.includes(key) ? { ...acc, [key]: +value } : acc,
             {}
         ) as UserPreferences;
         return userSavedPreferencesObj;
-    });
+    };
+
+    const [userPreferences, setUserPreferences] = useState(getUserSavedPreferences);
 
     const updateUserPreferences = ({ preferenceName, preferenceValue }: PreferenceChangeDetails) => {
         setUserPreferences(prevPreferences => ({

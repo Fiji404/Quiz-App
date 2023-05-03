@@ -3,19 +3,17 @@ import { SUPABASE_URL, PUBLIC_KEY } from '@/config/supabase.json';
 import { useContext, useEffect, useState } from 'react';
 import { QuizForm } from './QuizForm/QuizForm';
 import { Database } from '@/schema/supabase';
-import { PossibleQuizNames, QuestionDetails } from '@/types/SupabaseTypes';
+import { QuestionDetails } from '@/types/SupabaseTypes';
 import { FinalScreen } from './ResultsScreen/ResultsScreen';
 import { ReturnToQuizzes } from './ReturnToQuizzes/ReturnToQuizzes';
 import { QuizPreferencesContext } from '@/contexts/QuizPreferences/QuizPreferencesContext';
-
-interface Props {
-    currentQuizName: PossibleQuizNames | '';
-}
+import { QuizContext } from '@/contexts/QuizContext/QuizContext';
 
 const supabase = createClient<Database>(SUPABASE_URL, PUBLIC_KEY);
 
-export const QuizDashboard = ({ currentQuizName }: Props) => {
-    const { questionAmount,timeLimit } = useContext(QuizPreferencesContext);
+export const QuizDashboard = () => {
+    const { questionAmount, timeLimit } = useContext(QuizPreferencesContext);
+    const { currentQuizName } = useContext(QuizContext);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [randomQuestionNumber, setRandomQuestionNumber] = useState(() =>
         Math.trunc(Math.random() * questionAmount)

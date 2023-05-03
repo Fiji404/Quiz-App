@@ -17,12 +17,12 @@ const QUIZ_ICONS: Record<string, JSX.Element> = {
     JavaScript: <SiJavascript color="#F7DF1E" />,
     SASS: <FaSass color="#CC6397" />,
     Population: <BsFillPeopleFill color="#ccc" />,
-    Flags: <FaFlag color="#f00" />,
+    Flags: <FaFlag color="#f00" />
 };
 
 const TOPIC_ICONS: Record<string, JSX.Element> = {
     programming: <BsCodeSlash color="#16d616" />,
-    geography: <BsFillGeoAltFill color="#da0b0b" />,
+    geography: <BsFillGeoAltFill color="#da0b0b" />
 };
 
 export const AvailableQuiz = ({ title, description, topic }: Props) => {

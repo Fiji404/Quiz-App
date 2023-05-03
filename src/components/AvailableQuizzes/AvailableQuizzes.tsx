@@ -1,39 +1,42 @@
-import availableQuizesList from '@/data/availableQuizzes.json';
+import availableQuizzesList from '@/data/availableQuizzes.json';
 import { QuizContext } from '@/contexts/QuizContext/QuizContext';
 import { QuizDashboard } from '@components/QuizDashboard/QuizDashboard';
 import { AvailableQuiz } from './AvailableQuiz';
 import { useContext } from 'react';
 
 enum Quizzes {
-    html,
-    css,
-    javascript,
+    Html = 'html',
+    Css = 'css',
+    Javascript = 'javascript',
+    Sass = 'sass',
+    Population = 'population',
+    Flags = 'flags'
 }
 
-const checkIsQuizAvailable = (quizName: string) => {
-    if (Object.values(Quizzes).includes('html' || 'css' || 'javascript' || 'sass' || 'flags'))
-        return quizName;
-};
+const getValidQuizName = (quizName: string) =>
+    Object.values(Quizzes).find(possibleQuizName => possibleQuizName === quizName);
 
 export const AvailableQuizzes = () => {
-    const { updateCurrentQuizName, currentQuizName, isQuizStarted } = useContext(QuizContext);
+    const { updateCurrentQuizName, isQuizStarted } = useContext(QuizContext);
 
-    const chooseQuizHandler = ({ target }: React.MouseEvent) => {
+    const pickQuizHandler = ({ target }: React.MouseEvent) => {
         if (!(target instanceof Element)) return;
         const quizNameHeading = target.closest('button')?.closest('li')?.querySelector('h2');
         const quizName = quizNameHeading?.textContent?.trim().toLowerCase();
-        if (quizName && checkIsQuizAvailable(quizName)) updateCurrentQuizName(quizName);
+        const validQuizName = quizName && getValidQuizName(quizName);
+        if (validQuizName) updateCurrentQuizName(validQuizName);
     };
     return (
         <>
-            {!isQuizStarted && (
-                <ul onClick={chooseQuizHandler} className="mt-8 mb-4 max-w-[95%] mx-auto quiz-container">
-                    {availableQuizesList.map(props => (
-                        <AvailableQuiz key={props.title} {...props} />
+            {!isQuizStarted ? (
+                <ul onClick={pickQuizHandler} className="mt-8 mb-4 max-w-[95%] mx-auto quiz-container">
+                    {availableQuizzesList.map(quizInfo => (
+                        <AvailableQuiz key={quizInfo.title} {...quizInfo} />
                     ))}
                 </ul>
+            ) : (
+                <QuizDashboard />
             )}
-            {isQuizStarted && <QuizDashboard currentQuizName={currentQuizName} />}
         </>
     );
 };

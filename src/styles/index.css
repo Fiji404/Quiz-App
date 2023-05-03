@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+    html::-webkit-scrollbar {
+       @apply w-[.9rem];
+    }
+    html::-webkit-scrollbar-thumb {
+        @apply bg-[#cecece] rounded-full
+    }
     body {
         font-family: 'Open Sans', sans-serif;
     }
@@ -14,15 +20,13 @@
         @apply appearance-none w-6 h-6 border border-[#ccc] rounded-md relative cursor-pointer transition-colors;
     }
     .custom-radio-input:checked::before {
-        content: '\2713';
-        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+        @apply content-['\2713'] text-[#fff] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
     }
     .custom-radio-input:checked {
-        background-color: #27f127;
+        @apply bg-[#4daaf7];
     }
     .overlay {
-        content: '';
-        @apply absolute z-20 inset-0 bg-[#e6e6e6e8];
+        @apply content-[''] absolute z-20 inset-0 bg-[#e6e6e6e8];
     }
     .spin {
         animation: spin 1s infinite;
@@ -31,7 +35,6 @@
         @apply h-1 w-full bg-[#4DAAF7];
         animation: shrinking var(--time-limit) forwards;
     }
-
     @keyframes shrinking {
         to {
             @apply w-0;
